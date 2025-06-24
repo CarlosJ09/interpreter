@@ -2,7 +2,7 @@
 #
 # EOF (end-of-file) token is used to indicate that
 # there is no more input left for lexical analysis
-INTEGER, PLUS, EOF = 'INTEGER', 'PLUS', 'EOF'
+INTEGER, PLUS, EOF, SPACE = "INTEGER", "PLUS", "EOF", "SPACE"
 
 
 class Token(object):
@@ -19,17 +19,16 @@ class Token(object):
             Token(INTEGER, 3)
             Token(PLUS '+')
         """
-        return 'Token({type}, {value})'.format(
-            type=self.type,
-            value=repr(self.value)
-        )
+        return "Token({type}, {value})".format(type=self.type, value=repr(self.value))
 
     def __repr__(self):
         return self.__str__()
 
 
 class Interpreter(object):
+
     def __init__(self, text):
+
         # client string input, e.g. "3+5"
         self.text = text
         # self.pos is an index into self.text
@@ -38,7 +37,7 @@ class Interpreter(object):
         self.current_token = None
 
     def error(self):
-        raise Exception('Error parsing input')
+        raise Exception("Error parsing input")
 
     def get_next_token(self):
         """Lexical analyzer (also known as scanner or tokenizer)
@@ -58,6 +57,11 @@ class Interpreter(object):
         # what token to create based on the single character
         current_char = text[self.pos]
 
+        if self.is_white_space(current_char):
+            token = Token(SPACE, current_char)
+            self.pos += 1
+            return token
+
         # if the character is a digit then convert it to
         # integer, create an INTEGER token, increment self.pos
         # index to point to the next character after the digit,
@@ -67,12 +71,20 @@ class Interpreter(object):
             self.pos += 1
             return token
 
-        if current_char == '+':
+        if current_char == "+":
             token = Token(PLUS, current_char)
             self.pos += 1
             return token
 
         self.error()
+
+    def is_white_space(self, current_char: str):
+        """Evaluate if the current token it's a white space"""
+
+        if current_char == " ":
+            return True
+
+        return False
 
     def eat(self, token_type):
         # compare the current token type with the passed token
@@ -91,19 +103,24 @@ class Interpreter(object):
 
         left_number, right_number = "", ""
 
+
         # we expect the current token to be a digit integer
         while self.current_token.type == INTEGER:
             left_number = left_number + str(self.current_token.value)
             self.eat(INTEGER)
 
         # we expect the current token to be a '+' token
-        op = self.current_token
-        self.eat(PLUS)
+        if(self.current_token.type == PLUS):
+            op = self.current_token
+            self.eat(PLUS)
 
         # we expect the current token to be a digit integer
         while self.current_token.type == INTEGER:
             right_number = right_number + str(self.current_token.value)
             self.eat(INTEGER)
+
+        if self.current_token.type == SPACE:
+            self.eat(SPACE)
 
         # after the above call the self.current_token is set to
         # EOF token
@@ -119,7 +136,7 @@ class Interpreter(object):
 def main():
     while True:
         try:
-            text = input('calc> ')
+            text = input("calc> ")
         except EOFError:
             break
         if not text:
@@ -129,5 +146,5 @@ def main():
         print(result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
