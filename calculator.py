@@ -2,7 +2,7 @@
 #
 # EOF (end-of-file) token is used to indicate that
 # there is no more input left for lexical analysis
-INTEGER, PLUS, EOF, SPACE = "INTEGER", "PLUS", "EOF", "SPACE"
+INTEGER, PLUS, EOF, SPACE, MINUS = "INTEGER", "PLUS", "EOF", "SPACE", "MINUS"
 
 
 class Token(object):
@@ -76,6 +76,11 @@ class Interpreter(object):
             self.pos += 1
             return token
 
+        if current_char == "-":
+            token = Token(MINUS, current_char)
+            self.pos += 1
+            return token
+
         self.error()
 
     def is_white_space(self, current_char: str):
@@ -103,6 +108,10 @@ class Interpreter(object):
 
         left_number, right_number = "", ""
 
+        op = ""
+
+        result = 0
+
 
         # we expect the current token to be a digit integer
         while self.current_token.type == INTEGER:
@@ -114,8 +123,12 @@ class Interpreter(object):
 
         # we expect the current token to be a '+' token
         if(self.current_token.type == PLUS):
-            op = self.current_token
+            op = self.current_token.value
             self.eat(PLUS)
+
+        if(self.current_token.type == MINUS):
+            op = self.current_token.value
+            self.eat(MINUS)
 
         if self.current_token.type == SPACE:
             self.eat(SPACE)
@@ -132,8 +145,13 @@ class Interpreter(object):
         # has been successfully found and the method can just
         # return the result of adding two integers, thus
         # effectively interpreting client input
-        result = int(left_number) + int(right_number)
+        if(op == "+"):
+            result = int(left_number) +  int(right_number)
+        elif(op == "-"):
+            result = int(left_number) -  int(right_number)
+
         return result
+        
 
 
 def main():
