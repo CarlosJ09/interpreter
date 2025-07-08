@@ -109,18 +109,21 @@ class Interpreter(object):
             left_number = left_number + str(self.current_token.value)
             self.eat(INTEGER)
 
+        if self.current_token.type == SPACE:
+            self.eat(SPACE)
+
         # we expect the current token to be a '+' token
         if(self.current_token.type == PLUS):
             op = self.current_token
             self.eat(PLUS)
 
+        if self.current_token.type == SPACE:
+            self.eat(SPACE)
+
         # we expect the current token to be a digit integer
         while self.current_token.type == INTEGER:
             right_number = right_number + str(self.current_token.value)
             self.eat(INTEGER)
-
-        if self.current_token.type == SPACE:
-            self.eat(SPACE)
 
         # after the above call the self.current_token is set to
         # EOF token
